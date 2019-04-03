@@ -24,6 +24,20 @@ int main()
     in[i][0] = sin(440 * 2 * M_PI * i/N); //real
     in[i][1] = 0;                    //imaginary
   }
+ 
+ // Generate complex triangle wave array (constant amplitude only with low freqs. <50)
+  // Harmonics at intervals x2 of the fundamental freq. eg. 50Hz, harmonics at 150, 250 etc.
+
+  double f = 110;    //Frequency
+  double p = 8192/f;  //Period
+
+//
+  for( i = 0; i < N; i++)
+  {
+    in[i][0] = (2/M_PI) * asin(sin(((2 * M_PI)/p) * i));
+    in[i][1] = 0;
+  }
+//
 
 // Print input values into .txt file
  ofstream data;
@@ -31,6 +45,15 @@ int main()
   for (i = 0; i < N; i++) {
     data << left << setw(5) << i << setw(15) << in[i][0] << setw(10) << in[i][1] << endl;
   }
+ 
+ // Apply Hann window to the data
+//
+  for (int i = 0; i < N; i++)
+  {
+    double multiplier = 0.5 * (1 - cos(2 * M_PI * i/N));
+    in[i][0] = multiplier * in[i][0];
+  }
+//
 
   // Complex 1d fft function
   plan = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
