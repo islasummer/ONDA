@@ -70,7 +70,14 @@ int main()
     double a = out[i][0];
     double b = out[i][1];
     y[i] = sqrt(a*a+b*b) / N ;
+    if( y[i] > maxval && i > 0 )   // Detect highest peak and therefore approximate fundamental frequency
+     {
+       maxval = y[i];
+       freq = i;
+     }
   }
+ 
+  cout << "Maximum value is: " << maxval << endl << "Fundamental frequency is: " << freq << endl;
 
  // Print output values into .txt file
   ofstream data2;
