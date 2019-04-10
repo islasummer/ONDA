@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include "fftw3.h"
 #include "pcmread.h"
+#include "pitchdetectclass.h"
 #define N 8192
 using namespace std;
 
@@ -72,36 +73,10 @@ int main()
     y[i] = sqrt(a*a+b*b) / N ;
   }
 
-  for(i = N/2; i < N; i++)
-  {
-    y[i] = 0;
-  }
+ // Retrieve maximum value and estimate fundamental frequency
 
-  for (i = 0; i < N; i++)
-  {
-    if( y[i] > maxval && i > 0 )   // Detect highest peak and therefore approximate fundamental frequency
-    {
-      maxval = y[i];
-      freq = i;
-    }
-  }
-
-   double freqhz = freq * 44100 / 8192;   //Sampling freq / fft buffer size
-
-   cout << "Maximum value is: " << maxval << endl << "Fundamental frequency is: " << freqhz << endl;
-
-/*
-  int f0 = 440;
-  double n;
-  double fn = freq;
-  double sq = 1.059;          //pow (2, (1/12));
-
-  n = (log (fn/f0))/(log (sq));
-//  n = round(n);
-*/
-
-//  cout << "Steps away from A4: " << n << endl;
-
+   pitchdetect pitch;
+   pitch.detect(y);
 
   // Print output values into .txt file
   ofstream data2;
