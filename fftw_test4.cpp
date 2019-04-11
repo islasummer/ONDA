@@ -4,15 +4,31 @@
 #include <fstream>
 #include <iomanip>
 #include <cstdlib>
+#include <record/wav_header_working.h>
 #include "fftw3.h"
 #include "pcmread.h"
 #include "pitchdetectclass.h"
+#include "record/wav_header_working.h"
 #define N 8192
 using namespace std;
 
 
-int main()
+int main(int argc, char *argv[])
  {
+
+     int err;
+     waveRecorder recorder = waveRecorder();
+
+     err = recorder.recordWAV();
+
+     if (err)
+     {
+         fprintf(stderr, "Error recording WAV file: %d\n", err);
+         return err;
+     }
+
+
+
   fftw_complex *in = NULL, *out = NULL;    // Define the input and output array pointers
   fftw_plan plan;                             // Create a plan for the fft
   int i = 0;
