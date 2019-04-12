@@ -19,15 +19,22 @@ int main(int argc, char *argv[])
      int err;
      waveRecorder recorder = waveRecorder();
 
-     err = recorder.recordWAV();
 
-     if (err)
-     {
-         fprintf(stderr, "Error recording WAV file: %d\n", err);
-         return err;
+     for(int j = 0; j < 1; ++j) {
+         auto res = recorder.recordWAV();
+
+
+         for (int j = 0; j < res.first; j += 2) {
+             short x = *(short *)(res.second + j);
+             std::cout << x << std::endl;
+
+             free(res.second);
+         }
+
+
      }
 
-
+     
 
   fftw_complex *in = NULL, *out = NULL;    // Define the input and output array pointers
   fftw_plan plan;                             // Create a plan for the fft
