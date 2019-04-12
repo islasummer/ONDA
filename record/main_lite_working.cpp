@@ -5,12 +5,12 @@ int main(int argc, char *argv[])
     int err;
     waveRecorder recorder = waveRecorder();
 
-    err = recorder.recordWAV();
 
-    if (err)
-    {
-        fprintf(stderr, "Error recording WAV file: %d\n", err);
-        return err;
+    for (int j = 0; j < 10; ++j) {
+        auto res = recorder.recordWAV();
     }
+
+
+    free(res.second);
     return 0;
 }

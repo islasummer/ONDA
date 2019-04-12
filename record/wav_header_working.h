@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <string>
+#include <utility>
 
 class waveRecorder {
 public:
@@ -27,7 +28,7 @@ public:
     static uint16_t bytes_per_frame;
     static uint16_t bits_per_sample;
 
-    int recordWAV();
+    std::pair<int, char *> recordWAV();
 
     //constructor
     waveRecorder();
