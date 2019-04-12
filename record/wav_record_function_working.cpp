@@ -187,7 +187,9 @@ int waveRecorder::recordWAV(){
                 return err;
             }
             write(filedesc, buffer, size);
-            cout << binaryToDecimal(*buffer) << endl;
+
+            int buffdat = *buffer;
+            cout << binaryToDecimal(buffdat) << endl;
         }
     }
 
