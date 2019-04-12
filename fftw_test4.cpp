@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
              short x = *(short *)(res.second + j);
              std::cout << x << std::endl;
 
-             free(res.second);
+            //free(res.second);
          }
 
 
