@@ -16,25 +16,6 @@ using namespace std;
 int main(int argc, char *argv[])
  {
 
-     int err;
-     waveRecorder recorder = waveRecorder();
-
-
-     for(int j = 0; j < 1; ++j) {
-         auto res = recorder.recordWAV();
-
-
-         for (int j = 0; j < res.first; j += 2) {
-             short x = *(short *)(res.second + j);
-             std::cout << x << std::endl;
-
-             free(res.second);
-         }
-
-
-     }
-
-     
 
   fftw_complex *in = NULL, *out = NULL;    // Define the input and output array pointers
   fftw_plan plan;                             // Create a plan for the fft
@@ -47,22 +28,41 @@ int main(int argc, char *argv[])
 
 // Load audio data from PCM file
 
-
+/*
   readpcm pcm;
   pcm.read("/home/dan/Downloads/test-note-2.pcm");
+*/
 
   //int i = 0;
 
-  for (i = 0; i < N ; i++)
+    int err;
+    waveRecorder recorder = waveRecorder();
+
+    double vals[N];
+
+    for(int j = 0; j < 1; ++j) {
+        auto res = recorder.recordWAV();
+
+        for (int j = 0; j < res.first / 2; j++) {
+            short x = *(short *)(res.second + j * 2);
+            //std::cout << x << std::endl;
+            vals[j] = x;
+            //std::cout << vals[j] << std::endl;
+        }
+        free(res.second);
+    }
+
+
+  for (i = 0; i < N ; i ++)
   {
-    in[i][0] = pcm.dat[i];
+    in[i][0] = vals[i];
     in[i][1] = 0;
   }
 
 
 // Print input values into .txt file
  ofstream data;
- data.open ("fftwtest.txt");
+ data.open ("/home/dan/fftwtest.txt");
   for (i = 0; i < N; i++) {
     data << left << setw(5) << i << setw(15) << in[i][0] << setw(10) << in[i][1] << endl;
   }
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
 
   // Print output values into .txt file
   ofstream data2;
-  data2.open ("fftwtest2.txt");
+  data2.open ("/home/dan/fftwtest2.txt");
     for (i = 0; i < N; i++) {
       data2 << left << setw(5) << i << setw(15) << abs(y[i]) << endl;
       }
