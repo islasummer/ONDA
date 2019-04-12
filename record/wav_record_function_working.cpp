@@ -57,7 +57,7 @@ std::pair<int, char *> waveRecorder::recordWAV(){
     unsigned int sampleRate = sample_rate;
     int dir;
     snd_pcm_uframes_t frames = 32;
-    char *device = (char*) "plughw:0,1";
+    char *device = (char*) "plughw:0,0";
     char *buffer;
     int filedesc;
 
