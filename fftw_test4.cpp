@@ -4,11 +4,11 @@
 #include <fstream>
 #include <iomanip>
 #include <cstdlib>
-#include <record/wav_header_working.h>
+#include </home/pi/ONDA/record/wav_header_working.h>
 #include "fftw3.h"
 #include "pcmread.h"
 #include "pitchdetectclass.h"
-#include "record/wav_header_working.h"
+#include "/home/pi/ONDA/record/wav_header_working.h"
 #define N 8192
 using namespace std;
 
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 
 
   readpcm pcm;
-  pcm.read("/home/dan/Downloads/test-note-2.pcm");
+  pcm.read("/home/pi/ONDA/test-note-2.pcm");
 
   //int i = 0;
 
