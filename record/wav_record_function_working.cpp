@@ -61,10 +61,10 @@ std::pair<int, char *> waveRecorder::recordWAV(){
     char *buffer;
     int filedesc;
 
-    printf("Capture device is %s\n", device);
+    printf("Capture device is %s\n", "default");
 
     /* Open PCM device for recording (capture). */
-    err = snd_pcm_open(&handle, "default", SND_PCM_STREAM_CAPTURE, 0);
+    err = snd_pcm_open(&handle, device, SND_PCM_STREAM_CAPTURE, 0);
     if (err)
     {
         fprintf(stderr, "Unable to open PCM device: %s\n", snd_strerror(err));
