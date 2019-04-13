@@ -9,13 +9,14 @@ using namespace std;
 class pitchdetect
 {
 public:
+    double maxval;
+    double freq;
+    double freqhz;
 
   tuple<double, double> detect (double a[]) {
 
     int N = 8192;
     int i;
-    double maxval;
-    double freq;
 
     for(i = N/2; i < N; i++)
     {
@@ -35,9 +36,9 @@ public:
         freq = i;
       }
     }
-    double freqhz = freq * 44100 / 4096;
+     freqhz = freq * 44100 / 4096;
 
-    cout << "Maximum value is: " << maxval << endl << "Fundamental frequency is: " << freqhz << endl;
+    //cout << "Maximum value is: " << maxval << endl << "Fundamental frequency is: " << freqhz << endl;
     
     return make_tuple(maxval, freqhz);
   }
