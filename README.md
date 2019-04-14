@@ -8,4 +8,4 @@ based on the Cirrus Logic WM8731 audio codec. The audio card features a built in
 
 ## How to build
 
-The schematic for the audio card is provided in this branch, along with clear outlines of both sides of the PCB. The schematic and PCB were designed in OrCAD and the raw files are available on request. ![](https://github.com/Dan-escu/ONDA/blob/Hardware-Documentation/ONDA_HAT.jpg)
+The schematic for the audio card is provided in this branch, along with clear outlines of both sides of the PCB. The schematic and PCB were designed in OrCAD and the raw files are available on request. ![HAT](https://github.com/Dan-escu/ONDA/blob/Hardware-Documentation/ONDA_HAT.jpg)
