@@ -26,3 +26,5 @@ We welcome pull requests. For major changes, please open an issue first to discu
 ## Social Media
 
 [Instagram](https://www.instagram.com/ondasounds/ "Instagram") -------> Follow us on Instagram for the most frequent updates from project ONDA
+
+[Facebook](https://www.instagram.com/ondasounds/ "Facebook") -------> Like us on Facebook
