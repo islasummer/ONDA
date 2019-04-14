@@ -9,7 +9,7 @@ constexpr int max_num_of_frames = 8192;
 
 
 //define static members
-uint32_t waveRecorder::file_size = 0;
+//uint32_t waveRecorder::file_size = 0;
 uint16_t waveRecorder::number_of_channels = 1;
 uint32_t waveRecorder::sample_rate = 44100;
 //uint32_t waveRecorder::sample_rate = 8001;
@@ -19,9 +19,9 @@ uint32_t waveRecorder::bytes_per_second = sample_rate * number_of_channels * bit
 uint16_t waveRecorder::bytes_per_frame = number_of_channels * bits_per_sample / 8;
 
 
-auto multiplier =  waveRecorder::bits_per_sample / 8 * waveRecorder::number_of_channels;
-
-
+//auto multiplier =  waveRecorder::bits_per_sample / 8 * waveRecorder::number_of_channels;
+auto multiplier =  2;
+/*
 int binaryToDecimal(int n)
 {
     int num = n;
@@ -41,27 +41,29 @@ int binaryToDecimal(int n)
     }
 
     return dec_value;
-}
+} */
 
-std::pair<int, char *> waveRecorder::recordWAV(){
+//std::pair<int, char *> waveRecorder::recordWAV(){
+    char * waveRecorder::recordWAV(){
     //test initializing duration
-    uint32_t duration = 0;
+    //uint32_t duration = 0;
     //test dynamic file name
-    std::string fileName, name = "combine-test", type = ".pcm";
-    int part = 1;
+    //std::string fileName, name = "combine-test", type = ".pcm";
+    //int part = 1;
 
     int err;
-    int size;
+  //  int size;
     snd_pcm_t *handle;
     snd_pcm_hw_params_t *params;
     unsigned int sampleRate = sample_rate;
     int dir;
-    snd_pcm_uframes_t frames = 32;
-    char *device = (char*) "plughw:0,1";
-    char *buffer;
-    int filedesc;
+    //snd_pcm_uframes_t frames = 32;
+    snd_pcm_uframes_t frames = 1;
+    char *device = (char*) "plughw:0,0";
 
-    printf("Capture device is %s\n", "default");
+    //int filedesc;
+
+    //printf("Capture device is %s\n", "default");
 
     /* Open PCM device for recording (capture). */
     err = snd_pcm_open(&handle, device, SND_PCM_STREAM_CAPTURE, 0);
@@ -140,8 +142,8 @@ std::pair<int, char *> waveRecorder::recordWAV(){
         throw  std::exception();
     }
 
-    size = max_num_of_frames * multiplier; /* 2 bytes/sample, 2 channels */
-    buffer = (char *) malloc(size);
+    /* 2 bytes/sample, 2 channels */
+
     if (!buffer)
     {
         fprintf(stdout, "Buffer error.\n");
@@ -154,17 +156,17 @@ std::pair<int, char *> waveRecorder::recordWAV(){
     {
         fprintf(stderr, "Error retrieving period time: %s\n", snd_strerror(err));
         snd_pcm_close(handle);
-        free(buffer);
+  //      free(buffer);
         throw  std::exception();
     }
 
-    fileName = name + std::to_string(part) + type;
+    //fileName = name + std::to_string(part) + type;
 
-    uint32_t pcm_data_size = sample_rate * bytes_per_frame * duration / 1000;
-    file_size = pcm_data_size + 44 - 8;
+  //  uint32_t pcm_data_size = sample_rate * bytes_per_frame * duration / 1000;
+  //  file_size = pcm_data_size + 44 - 8;
     //file_size = pcm_data_size;
 
-    filedesc = open(fileName.c_str(), O_WRONLY | O_CREAT, 0644);
+    //filedesc = open(fileName.c_str(), O_WRONLY | O_CREAT, 0644);
     /*err = writeWAVHeader(filedesc);
     if (err)
     {
@@ -175,15 +177,16 @@ std::pair<int, char *> waveRecorder::recordWAV(){
         return err;
     }*/
 
-    fprintf(stdout, "Channels: %d\n", number_of_channels);
+  //  fprintf(stdout, "Channels: %d\n", number_of_channels);
 
     long num_read_frames = 0;
-    for(duration = 0; duration < 1; duration ++){
-        printf("___duration: %d\n", duration);
+    //for(duration = 0; duration < 1; duration ++){
+      //  printf("___duration: %d\n", duration);
         //for(int i = ( (1000*1000) / (sample_rate / frames)); i > 0; i--)
         //{
             while (num_read_frames < max_num_of_frames) {
                 err = snd_pcm_readi(handle, buffer + num_read_frames * multiplier, frames);
+                //err = snd_pcm_readi(handle, buffer+2, frames);
 
                 if (err > 0) {
                     num_read_frames += err;
@@ -194,31 +197,34 @@ std::pair<int, char *> waveRecorder::recordWAV(){
                 if (err < 0) {
                     fprintf(stderr, "Error occured while recording: %s\n", snd_strerror(err));
                     snd_pcm_close(handle);
-                    free(buffer);
-                    close(filedesc);
+                //    free(buffer);
+                    //close(filedesc);
                     throw std::exception();
                 }
             }
 
             //write(filedesc, buffer, size);
 
-            int buffdat = *buffer;
+          //  int buffdat = *buffer;
             //cout << binaryToDecimal(buffdat) << endl;
             //cout << buffdat << endl;
             //cout << sizeof(buffer) << endl << sizeof(*buffer) << endl << sizeof(&buffer) << endl;
         //}
-    }
 
 
-    close(filedesc);
 
+    //close(filedesc);
+
+
+
+    /*
     duration *= 1000;
     //Rewrite the header
     pcm_data_size = sample_rate * bytes_per_frame * duration / 1000;
     file_size = pcm_data_size + 44 - 8;
     //file_size = pcm_data_size;
 
-    /*filedesc = open(fileName.c_str(), O_WRONLY | O_CREAT, 0644);
+    filedesc = open(fileName.c_str(), O_WRONLY | O_CREAT, 0644);
     err = writeWAVHeader(filedesc);
     close(filedesc);
     */
@@ -227,11 +233,15 @@ std::pair<int, char *> waveRecorder::recordWAV(){
     snd_pcm_close(handle);
     //free(buffer);
 
-    printf("Finished writing to %s\n", fileName.c_str());
-    return {num_read_frames * multiplier, buffer};
+    //printf("Finished writing to %s\n", fileName.c_str());
+    //  return {(num_read_frames * multiplier), buffer};
+      return buffer;
 }
 
 waveRecorder::waveRecorder(){
+  auto size = max_num_of_frames * multiplier;
+    buffer = new char[size * 2];
+  //  buffer = new char[size+116];
     /*memcpy(&RIFF_marker, "RIFF", 4);
     memcpy(&filetype_header, "WAVE", 4);
     memcpy(&format_marker, "fmt ", 4);*/
