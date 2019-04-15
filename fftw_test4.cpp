@@ -10,14 +10,15 @@
 #include "fftw3.h"
 //#include "pcmread.h"
 #include "pitchdetectclass.h"
+#include "displayclass.h"
 #include "record/wav_header_working.h"
 //#include "pcmtoarrayclass.h"
 #define N 8192
-#include "/home/pi/wiringPi/wiringPi/wiringPi.h"
-#include "/home/pi/wiringPi/devLib/lcd.h"
+//#include "/home/pi/wiringPi/wiringPi/wiringPi.h"
+//#include "/home/pi/wiringPi/devLib/lcd.h"
 using namespace std;
 
-
+/*
 //USE WIRINGPI PIN NUMBERS
 #define LCD_RS  25               //Register select pin
 #define LCD_E   6                //Enable Pin
@@ -25,6 +26,7 @@ using namespace std;
 #define LCD_D5  22               //Data pin 5
 #define LCD_D6  21               //Data pin 6
 #define LCD_D7  14               //Data pin 7
+*/
 
 //int main(int argc, char *argv[])
 int main()
@@ -32,7 +34,7 @@ int main()
 
   while(true){
 
-   usleep (100000);
+//   usleep (100000);
 
 
   fftw_complex *in = NULL, *out = NULL;    // Define the input and output array pointers
@@ -168,18 +170,18 @@ int main()
 
 //
   //  string f = to_string(pitch.freqhz);
-//
+/*
     static int lcdHandle;
     wiringPiSetup();
     lcdHandle = lcdInit (2, 16, 4, LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7, 0, 0, 0, 0);
 
-    lcdPuts (lcdHandle, pitch.freqhz) ;
+    lcdPuts (lcdHandle, "Frequency:") ;
 
 //    lcdPrintf(lcdHandle, "%f", pitch.freqhz);
 //    lcdClear(lcd);
 //
 //    lcd_string("F= " + str(freqLCD), 1);
-//
+*/
 
   // Print output values into .txt file
   ofstream data2;
@@ -190,7 +192,11 @@ int main()
 //
   //    cout << y[i] << endl;
 
+  displaylcd disp;
 
+  thread worker(disp.lcd, pitch.freqhz);
+
+//  disp.lcd(pitch.freqhz);
 //
 
 //
@@ -202,10 +208,8 @@ int main()
   fftw_free(in);
   fftw_free(out);
 
-
-
   //usleep (100000);
-//  worker.join();
+  worker.join();
 
  }
 
