@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.10)
 project(ONDA)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -14,4 +14,4 @@ add_executable(ONDA
         pitchdetectclass.h
 )
 
-target_link_libraries(ONDA fftw3 record)
+target_link_libraries(ONDA fftw3 record wiringPi wiringPiDev)

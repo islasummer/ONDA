@@ -5,7 +5,7 @@
 #include <exception>
 using namespace std;
 
-constexpr int max_num_of_frames = 8192;
+constexpr int max_num_of_frames = 8192;  //16384
 
 
 //define static members
@@ -240,8 +240,8 @@ int binaryToDecimal(int n)
 
 waveRecorder::waveRecorder(){
   auto size = max_num_of_frames * multiplier;
-    buffer = new char[size * 2];
-  //  buffer = new char[size+116];
+      buffer = new char[size * 2];
+      //buffer = new char[size+116];
     /*memcpy(&RIFF_marker, "RIFF", 4);
     memcpy(&filetype_header, "WAVE", 4);
     memcpy(&format_marker, "fmt ", 4);*/

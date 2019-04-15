@@ -4,25 +4,35 @@
 #include <fstream>
 #include <iomanip>
 #include <cstdlib>
-<<<<<<< HEAD
 #include <vector>
 #include <record/wav_header_working.h>
-=======
->>>>>>> c4e58faa28f1ac746919cc1891e1e77adaa921ba
+#include <thread>
 #include "fftw3.h"
-#include "pcmread.h"
+//#include "pcmread.h"
 #include "pitchdetectclass.h"
 #include "record/wav_header_working.h"
+//#include "pcmtoarrayclass.h"
 #define N 8192
+#include "/home/pi/wiringPi/wiringPi/wiringPi.h"
+#include "/home/pi/wiringPi/devLib/lcd.h"
 using namespace std;
 
+
+//USE WIRINGPI PIN NUMBERS
+#define LCD_RS  25               //Register select pin
+#define LCD_E   6                //Enable Pin
+#define LCD_D4  23               //Data pin 4
+#define LCD_D5  22               //Data pin 5
+#define LCD_D6  21               //Data pin 6
+#define LCD_D7  14               //Data pin 7
 
 //int main(int argc, char *argv[])
 int main()
  {
 
-<<<<<<< HEAD
   while(true){
+
+   usleep (100000);
 
 
   fftw_complex *in = NULL, *out = NULL;    // Define the input and output array pointers
@@ -35,17 +45,6 @@ int main()
   //using cmplx = double[2];
   in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N);
   out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N);
-=======
-    //while(true) {
-
-        fftw_complex *in = NULL, *out = NULL;    // Define the input and output array pointers
-        fftw_plan plan;                             // Create a plan for the fft
-        int i = 0;
-
-// Allocate the input and output arrays
-        in = (fftw_complex *) fftw_malloc(sizeof(fftw_complex) * N);
-        out = (fftw_complex *) fftw_malloc(sizeof(fftw_complex) * N);
->>>>>>> c4e58faa28f1ac746919cc1891e1e77adaa921ba
 
   //in.reserve(N);
 
@@ -58,25 +57,17 @@ int main()
   pcm.read("/home/dan/Downloads/test-note-2.pcm");
 */
 
-<<<<<<< HEAD
-  int i = 0;
-=======
-        //int i = 0;
->>>>>>> c4e58faa28f1ac746919cc1891e1e77adaa921ba
+//  int i = 0;
 
-        int err;
-        waveRecorder recorder;
-        try {
-            recorder = waveRecorder();
-        } catch(...) {
-            std::cout << "Exception thrown!\n";
-            return -1;
-        }
+//    int err;
+//
+   waveRecorder recorder = waveRecorder();
 
-<<<<<<< HEAD
    double vals[N];
 //   short *x;
 //   x = new short[N];
+
+//    thread worker(recorder.recordWAV);
 
     for(int k = 0; k < 1; ++k) {
         auto res = recorder.recordWAV();
@@ -97,28 +88,14 @@ int main()
       //  delete[] res;
   //      delete[] x;
     }
-=======
-        double vals[N];
-
-        for (int j = 0; j < 1; ++j) {
-            auto res = recorder.recordWAV();
-
-            for (int j = 0; j < res.first / 2; j++) {
-                short x = *(short *) (res.second + j * 2);
-                //std::cout << x << std::endl;
-                vals[j] = x;
-                //std::cout << vals[j] << std::endl;
-            }
-            free(res.second);
-        }
->>>>>>> c4e58faa28f1ac746919cc1891e1e77adaa921ba
+    //
 
 //
+//  usleep (100000);
 
-<<<<<<< HEAD
   for (int i = 0; i < N ; i ++)
   {
-    in[i][0] =vals[i];
+    in[i][0] = vals[i];
     //std::cout << vals[i] << std::endl;
     in[i][1] = 0;
 
@@ -128,28 +105,13 @@ int main()
 
 // Print input values into .txt file
  ofstream data;
- data.open ("/home/dan/fftwtest.txt");
+ data.open ("/home/pi/fftwtest.txt");
   for (int i = 0; i < N; i++) {
-    data << left << setw(5) << i << setw(15) << in[i][0] << setw(10) << in[i][1] << endl;
+    data << left << setw(15) << i << setw(15) << in[i][0] << setw(10) << in[i][1] << endl;
   }
-=======
-        for (i = 0; i < N; i++) {
-            in[i][0] = vals[i];
-            in[i][1] = 0;
-        }
 
-
-// Print input values into .txt file
-        ofstream data;
-        data.open("/home/dan/fftwtest.txt");
-        for (i = 0; i < N; i++) {
-            data << left << setw(5) << i << setw(15) << in[i][0] << setw(10) << in[i][1] << endl;
-        }
->>>>>>> c4e58faa28f1ac746919cc1891e1e77adaa921ba
-
-        // Apply Hann window to the data
+ // Apply Hann window to the data
 //
-<<<<<<< HEAD
   for (int i = 0; i < N; i++)
   {
     double multiplier = 0.5 * (1 - cos(2 * M_PI * i/N));
@@ -158,23 +120,16 @@ int main()
 //    cout  << in[i][0] << endl;
 //    cout  << i << endl;
   }
-=======
-        for (int i = 0; i < N; i++) {
-            double multiplier = 0.5 * (1 - cos(2 * M_PI * i / N));
-            in[i][0] = multiplier * in[i][0];
-        }
->>>>>>> c4e58faa28f1ac746919cc1891e1e77adaa921ba
 //
 
-        // Complex 1d fft function
-        plan = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
-        // Real input to complex output function below
-        //p = fftw_plan_dft_r2c_1d(N, in[0], reinterpret_cast<fftw_complex*>(&out[0]), FFTW_ESTIMATE);
+  // Complex 1d fft function
+  plan = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+  // Real input to complex output function below
+  //p = fftw_plan_dft_r2c_1d(N, in[0], reinterpret_cast<fftw_complex*>(&out[0]), FFTW_ESTIMATE);
 
-        // Execute the fft
-        fftw_execute(plan);
+  // Execute the fft
+  fftw_execute(plan);
 
-<<<<<<< HEAD
 /*
   for (int i = 0; i < N; i++){
 
@@ -190,8 +145,8 @@ int main()
   //int i;
   double y[N];
   //double y[i] =0;
-  double maxval = 0;
-  double freq = 0;
+//  double maxval;
+//  double freqhz;
 
   for (int i = 0; i < N; i++)
   {
@@ -201,63 +156,58 @@ int main()
     y[i] = sqrt(a*a+b*b) / N ;
 //    cout  << y[i] << endl;
   }
-=======
-        // Calculate complex output vector for plotting
-        double y[i];
-        //double maxval = 0;
-        //double freq = 0;
 
-        for (i = 0; i < N; i++) {
-            double a = out[i][0];
-            double b = out[i][1];
-            y[i] = sqrt(a * a + b * b) / N;
-        }
+ // Retrieve maximum value and estimate fundamental frequency
 
-        // Retrieve maximum value and estimate fundamental frequency
->>>>>>> c4e58faa28f1ac746919cc1891e1e77adaa921ba
+   pitchdetect pitch;
+   pitch.detect(y);
 
-        pitchdetect pitch;
-        pitch.detect(y);
+   cout << "Maximum value is: " << pitch.maxval << endl << "Fundamental frequency is: " << pitch.freqhz << endl;
 
-        cout << "Maximum value is: " << pitch.maxval << endl << "Fundamental frequency is: " << pitch.freqhz << endl;
+   //string freqLCD = to_string(pitch.freqhz);
 
-<<<<<<< HEAD
+//
+  //  string f = to_string(pitch.freqhz);
+//
+    static int lcdHandle;
+    wiringPiSetup();
+    lcdHandle = lcdInit (2, 16, 4, LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7, 0, 0, 0, 0);
+
+    lcdPuts (lcdHandle, pitch.freqhz) ;
+
+//    lcdPrintf(lcdHandle, "%f", pitch.freqhz);
+//    lcdClear(lcd);
+//
+//    lcd_string("F= " + str(freqLCD), 1);
+//
+
   // Print output values into .txt file
   ofstream data2;
-  data2.open ("/home/dan/fftwtest2.txt");
+  data2.open ("/home/pi/fftwtest2.txt");
     for (int i = 0; i < N; i++) {
-      data2 << left << setw(5) << i << setw(15) << abs(y[i]) << endl;
-
+      data2 << left << setw(15) << i << setw(15) << abs(y[i]) << endl;
+    }
+//
   //    cout << y[i] << endl;
-      }
-=======
-        // Print output values into .txt file
-        ofstream data2;
-        data2.open("/home/dan/fftwtest2.txt");
-        for (i = 0; i < N; i++) {
-            data2 << left << setw(5) << i << setw(15) << abs(y[i]) << endl;
-        }
->>>>>>> c4e58faa28f1ac746919cc1891e1e77adaa921ba
+
 
 //
 
 //
 
-        // Deallocate plan
-        fftw_destroy_plan(plan);
+  // Deallocate plan
+  fftw_destroy_plan(plan);
 
-        // Deallocate arrays
-        fftw_free(in);
-        fftw_free(out);
-   // }
+  // Deallocate arrays
+  fftw_free(in);
+  fftw_free(out);
 
-<<<<<<< HEAD
-//
+
+
+  //usleep (100000);
+//  worker.join();
 
  }
 
   return 0;
-=======
-         return 0;
->>>>>>> c4e58faa28f1ac746919cc1891e1e77adaa921ba
 }
