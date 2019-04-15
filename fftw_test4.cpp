@@ -12,14 +12,11 @@
 #include "pitchdetectclass.h"
 #include "displayclass.h"
 #include "record/wav_header_working.h"
-<<<<<<< HEAD
 #define N 16384
-=======
 //#include "pcmtoarrayclass.h"
 #define N 8192
 //#include "/home/pi/wiringPi/wiringPi/wiringPi.h"
 //#include "/home/pi/wiringPi/devLib/lcd.h"
->>>>>>> 5cecb89ae0985ebb705fa69c381e0da1fe323c42
 using namespace std;
 
 /*
