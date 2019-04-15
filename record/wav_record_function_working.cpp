@@ -1,71 +1,64 @@
+/**
+* @file hw_setup_record
+* @brief defines hardware parameters and writes them to PCM device, samples PCM audio into buffer, returns buffer
+* @author songwongtp, Niall Marshall
+* @date 07/04/2019
+
+*/
+
+
+/*! @brief Include appropriate libraries and headers*/
+
 #include "wav_header_working.h"
 #include <iostream>
 #include <cmath>
 #include <utility>
 #include <exception>
+
 using namespace std;
 
-constexpr int max_num_of_frames = 8192;  //16384
+
+constexpr int max_num_of_frames = 8192; //!<Maximum number of frames to store in buffer (for mono audio, 1 frame = 1 sample, for stereo, 1 frame = 2 samples
+
+/*! @brief Define static members (parameters must be supported by PCM device)*/
+uint16_t waveRecorder::number_of_channels = 1;	//!<Number of audio channels 
+uint32_t waveRecorder::sample_rate = 44100; 	//!<Sampling rate 
+uint16_t waveRecorder::bits_per_sample = 16;	//!<Data size of samples 
+uint32_t waveRecorder::bytes_per_second = sample_rate * number_of_channels * bits_per_sample / 8;	//!<Bytes per second 
+uint16_t waveRecorder::bytes_per_frame = number_of_channels * bits_per_sample / 8; //!<Bytes per frame
+auto multiplier =  waveRecorder::bits_per_sample / 8 * waveRecorder::number_of_channels; //!<Multiplier for buffer
 
 
-//define static members
-//uint32_t waveRecorder::file_size = 0;
-uint16_t waveRecorder::number_of_channels = 1;
-uint32_t waveRecorder::sample_rate = 44100;
-//uint32_t waveRecorder::sample_rate = 8001;
-uint16_t waveRecorder::bits_per_sample = 16;
-//uint16_t waveRecorder::bits_per_sample = 8;
-uint32_t waveRecorder::bytes_per_second = sample_rate * number_of_channels * bits_per_sample / 8;
-uint16_t waveRecorder::bytes_per_frame = number_of_channels * bits_per_sample / 8;
-
-
-//auto multiplier =  waveRecorder::bits_per_sample / 8 * waveRecorder::number_of_channels;
-auto multiplier =  2;
-/*
-int binaryToDecimal(int n)
-{
-    int num = n;
-    int dec_value = 0;
-
-    // Initializing base value to 1, i.e 2^0
-    int base = 1;
-
-    int temp = num;
-    while (temp) {
-        int last_digit = temp % 10;
-        temp = temp / 10;
-
-        dec_value += last_digit * base;
-
-        base = base * 2;
-    }
-
-    return dec_value;
-} */
 
 //std::pair<int, char *> waveRecorder::recordWAV(){
-    char * waveRecorder::recordWAV(){
-    //test initializing duration
-    //uint32_t duration = 0;
-    //test dynamic file name
-    //std::string fileName, name = "combine-test", type = ".pcm";
-    //int part = 1;
+    
+/**
+* @brief samplePCM is called from the class PCMinitialiser writes hardware parameters to the declared PCM device, using ALSA library functions, then the PCM device is read and the data stored in a buffer
+* Each ALSA function will be described briefly, further information can be found here:https://www.alsa-project.org/alsa-doc/alsa-lib/group___p_c_m___h_w___params.html
+*/
 
-    int err;
-  //  int size;
+char * waveRecorder::recordWAV(){
+
+    int err; //!<Error code for ALSA functions
+
+/**
+* @brief Defines PCM hande
+*/
     snd_pcm_t *handle;
+/**
+* @brief PCM hardware configuration space container
+*/
     snd_pcm_hw_params_t *params;
-    unsigned int sampleRate = sample_rate;
-    int dir;
-    //snd_pcm_uframes_t frames = 32;
-    snd_pcm_uframes_t frames = 1;
-    char *device = (char*) "plughw:0,0";
 
-    //int filedesc;
+    unsigned int sampleRate = sample_rate;	//!<Setting sample rate from header equal to local sample rate
+    int dir;	//!<Sub unit direction
+    snd_pcm_uframes_t frames = 1;	//!<number of frames to fill buffer (used in read function below)
+    char *device = (char*) "plughw:0,0";	//!<Name of PCM device, can be found by typing aplay -l into command line, (1st digit is 'card number', 2nd digit is 'device number)
 
-    //printf("Capture device is %s\n", "default");
+	/**
+* @brief Open PCM device for audio capture, check error codes and throw exception if cannot open 
+*/
 
-    /* Open PCM device for recording (capture). */
     err = snd_pcm_open(&handle, device, SND_PCM_STREAM_CAPTURE, 0);
     if (err)
     {
@@ -73,15 +66,24 @@ int binaryToDecimal(int n)
         throw std::exception();
     }
 
-    /* Allocate a hardware parameters object. */
+
+	/**
+* @brief Allocate a hardware parameters object 
+*/
     snd_pcm_hw_params_alloca(&params);
 
-    /* Fill it in with default values. */
+/**
+* @brief Fill it in with default values
+*/
     snd_pcm_hw_params_any(handle, params);
 
-    /* ### Set the desired hardware parameters. ### */
+/**
+ * @brief Set the desired hardware parameters
+ */
 
-    /* Interleaved mode */
+    /**
+ * Interleaved mode (irrelevant for mono audio sampling), check error codes and throw exception if cannot set
+ */
     err = snd_pcm_hw_params_set_access(handle, params, SND_PCM_ACCESS_RW_INTERLEAVED);
     if (err)
     {
@@ -89,7 +91,9 @@ int binaryToDecimal(int n)
         snd_pcm_close(handle);
         throw std::exception();
     }
-    /* Signed 16-bit little-endian format */
+    /**
+     * @brief Signed 16-bit little-endian format, check error codes and throw exception if cannot set
+     */
     if (bits_per_sample == 16) err = snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S16_LE);
     else err = snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_U8);
     if (err)
@@ -98,7 +102,9 @@ int binaryToDecimal(int n)
         snd_pcm_close(handle);
         throw std::exception();
     }
-    /* Two channels (stereo) */
+    /**
+	* @brief One or two channels (mono or stereo), defined in static members, check error codes and throw exception if cannot set 
+        */
     err = snd_pcm_hw_params_set_channels(handle, params, number_of_channels);
     if (err)
     {
@@ -106,7 +112,9 @@ int binaryToDecimal(int n)
         snd_pcm_close(handle);
         throw std::exception();
     }
-    /* 44100 bits/second sampling rate (CD quality) */
+    /**
+	* @brief Set sampling rate, defined above, check error codes and throw exception if cannot set
+	*/
     sampleRate = sample_rate;
     err = snd_pcm_hw_params_set_rate_near(handle, params, &sampleRate, &dir);
     if (err)
@@ -116,7 +124,9 @@ int binaryToDecimal(int n)
         throw std::exception();
     }
     sample_rate = sampleRate;
-    /* Set period size*/
+    /**
+	* @brief Set period size, check error codes and throw exception if cannot set
+	*/
     err = snd_pcm_hw_params_set_period_size_near(handle, params, &frames, &dir);
     if (err)
     {
@@ -124,7 +134,9 @@ int binaryToDecimal(int n)
         snd_pcm_close(handle);
         throw std::exception();
     }
-    /* Write the parameters to the driver */
+    /**
+	* @brief Write the parameters to the driver, check error codes and throw exception if cannot set
+	*/
     err = snd_pcm_hw_params(handle, params);
     if (err < 0)
     {
@@ -133,7 +145,9 @@ int binaryToDecimal(int n)
         throw  std::exception();
     }
 
-    /* Use a buffer large enough to hold one period */
+    /**
+	* @brief Use a buffer large enough to hold one period, check error codes and throw exception if cannot find
+	*/
     err = snd_pcm_hw_params_get_period_size(params, &frames, &dir);
     if (err)
     {
@@ -142,14 +156,9 @@ int binaryToDecimal(int n)
         throw  std::exception();
     }
 
-    /* 2 bytes/sample, 2 channels */
-
-    if (!buffer)
-    {
-        fprintf(stdout, "Buffer error.\n");
-        snd_pcm_close(handle);
-        throw std::exception();
-    }
+    /**
+	* @brief Get period time, check error codes and throw exception if cannot get
+	*/
 
     err = snd_pcm_hw_params_get_period_time(params, &sampleRate, &dir);
     if (err)
@@ -160,33 +169,15 @@ int binaryToDecimal(int n)
         throw  std::exception();
     }
 
-    //fileName = name + std::to_string(part) + type;
-
-  //  uint32_t pcm_data_size = sample_rate * bytes_per_frame * duration / 1000;
-  //  file_size = pcm_data_size + 44 - 8;
-    //file_size = pcm_data_size;
-
-    //filedesc = open(fileName.c_str(), O_WRONLY | O_CREAT, 0644);
-    /*err = writeWAVHeader(filedesc);
-    if (err)
-    {
-        fprintf(stderr, "Error writing .wav header.");
-        snd_pcm_close(handle);
-        free(buffer);
-        close(filedesc);
-        return err;
-    }*/
-
-  //  fprintf(stdout, "Channels: %d\n", number_of_channels);
-
-    long num_read_frames = 0;
-    //for(duration = 0; duration < 1; duration ++){
-      //  printf("___duration: %d\n", duration);
-        //for(int i = ( (1000*1000) / (sample_rate / frames)); i > 0; i--)
-        //{
-            while (num_read_frames < max_num_of_frames) {
+   
+    long num_read_frames = 0; //!<Number of frames read from PCM device
+    
+    /**
+	* @brief snd_pcm_readi reads PCM data into buffer, until number of read frames reaches the maximum number of read frames, check error codes and throw exception if cannot record to full length
+	*/
+           
+	 while (num_read_frames < max_num_of_frames) {
                 err = snd_pcm_readi(handle, buffer + num_read_frames * multiplier, frames);
-                //err = snd_pcm_readi(handle, buffer+2, frames);
 
                 if (err > 0) {
                     num_read_frames += err;
@@ -195,39 +186,13 @@ int binaryToDecimal(int n)
                 if (err < 0) err = snd_pcm_recover(handle, err, 0);
 
                 if (err < 0) {
-                    fprintf(stderr, "Error occured while recording: %s\n", snd_strerror(err));
-                    snd_pcm_close(handle);
-                //    free(buffer);
-                    //close(filedesc);
-                    throw std::exception();
-                }
-            }
+                    fprintf(stderr, "Error occured while recording: %s\n", 		
+		snd_strerror(err));
+		snd_pcm_close(handle);
+		throw std::exception();
+            	}
+         }	
 
-            //write(filedesc, buffer, size);
-
-          //  int buffdat = *buffer;
-            //cout << binaryToDecimal(buffdat) << endl;
-            //cout << buffdat << endl;
-            //cout << sizeof(buffer) << endl << sizeof(*buffer) << endl << sizeof(&buffer) << endl;
-        //}
-
-
-
-    //close(filedesc);
-
-
-
-    /*
-    duration *= 1000;
-    //Rewrite the header
-    pcm_data_size = sample_rate * bytes_per_frame * duration / 1000;
-    file_size = pcm_data_size + 44 - 8;
-    //file_size = pcm_data_size;
-
-    filedesc = open(fileName.c_str(), O_WRONLY | O_CREAT, 0644);
-    err = writeWAVHeader(filedesc);
-    close(filedesc);
-    */
 
     snd_pcm_drain(handle);
     snd_pcm_close(handle);
@@ -241,8 +206,4 @@ int binaryToDecimal(int n)
 waveRecorder::waveRecorder(){
   auto size = max_num_of_frames * multiplier;
       buffer = new char[size * 2];
-      //buffer = new char[size+116];
-    /*memcpy(&RIFF_marker, "RIFF", 4);
-    memcpy(&filetype_header, "WAVE", 4);
-    memcpy(&format_marker, "fmt ", 4);*/
 }
