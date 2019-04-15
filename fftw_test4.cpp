@@ -4,11 +4,11 @@
 #include <fstream>
 #include <iomanip>
 #include <cstdlib>
-#include </home/pi/ONDA/record/wav_header_working.h>
+#include </home/niall/ONDA/record/wav_header_working.h>
 #include "fftw3.h"
 #include "pcmread.h"
 #include "pitchdetectclass.h"
-#include "/home/pi/ONDA/record/wav_header_working.h"
+#include "/home/niall/ONDA/record/wav_header_working.h"
 #define N 8192
 using namespace std;
 
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
              short x = *(short *)(res.second + j);
              std::cout << x << std::endl;
 
-            //free(res.second);
+            free(res.second);
          }
 
 
