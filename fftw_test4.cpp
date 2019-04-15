@@ -8,7 +8,7 @@
 #include "pcmread.h"
 #include "pitchdetectclass.h"
 #include "record/wav_header_working.h"
-#define N 8192
+#define N 16384
 using namespace std;
 
 

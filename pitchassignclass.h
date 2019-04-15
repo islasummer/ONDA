@@ -9,6 +9,7 @@ using namespace std;
 class pitchassign
 {
 public:
+
   void assign(double x){
     if (81.19 <= x && x <= 83.63){
       cout << "E2\n";
