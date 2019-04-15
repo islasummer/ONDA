@@ -28,10 +28,14 @@ public:
     static uint16_t bytes_per_frame;
     static uint16_t bits_per_sample;
 
-    std::pair<int, char *> recordWAV();
+    //std::pair<int, char *> recordWAV();
+    char * recordWAV();
+
+    char *buffer;
 
     //constructor
     waveRecorder();
+    ~waveRecorder(){ delete[] buffer; }
 };
 
 #endif

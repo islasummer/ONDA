@@ -23,7 +23,7 @@ public:
       a[i] = 0;
     }
 
-    for(i = 0; i < 3; i++)
+    for(i = 0; i < 21; i++)    // For N = 32768 , i < 40  (50Hz at 38)
     {
       a[i] = 0;
     }
@@ -36,10 +36,10 @@ public:
         freq = i;
       }
     }
-     freqhz = freq * 44100 / 4096;
+     freqhz = freq * 44100 / N;
 
     //cout << "Maximum value is: " << maxval << endl << "Fundamental frequency is: " << freqhz << endl;
-    
+
     return make_tuple(maxval, freqhz);
   }
 };
