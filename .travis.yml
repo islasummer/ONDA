@@ -5,12 +5,23 @@ sudo: false
 branches:
   only:
     - master
+    
+    #Environment variables
+env:
+  global:
+    - GH_REPO_NAME: ONDA
+    - DOXYFILE: $TRAVIS_BUILD_DIR/ONDA/.travis.yml
+- GH_REPO_REF: github.com/Dan-escu/ONDA.git
 
 # Install dependencies
 addons:
   apt:
     packages:
       - doxygen
+      - doxygen-doc
+      - doxygen-latex
+      - doxygen-gui
+      - graphviz
 
 # Build your code e.g. by calling make
 script:
