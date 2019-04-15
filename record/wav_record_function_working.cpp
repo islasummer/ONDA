@@ -194,16 +194,18 @@ char * waveRecorder::recordWAV(){
          }	
 
 
-    snd_pcm_drain(handle);
-    snd_pcm_close(handle);
-    //free(buffer);
-
-    //printf("Finished writing to %s\n", fileName.c_str());
-    //  return {(num_read_frames * multiplier), buffer};
-      return buffer;
+    snd_pcm_drain(handle); //!<Stops the PCM preserving pending frames
+    snd_pcm_close(handle); //!<Close PCM handle
+    
+	/**
+ 		@brief returns buffer to make it available for FFT
+*/
+      return buffer; 
 }
 
+
+
 waveRecorder::waveRecorder(){
-  auto size = max_num_of_frames * multiplier;
-      buffer = new char[size * 2];
+  auto size = max_num_of_frames * multiplier; //!<Calculate size of buffer
+      buffer = new char[size * 2];	      //!<Allocate memory to buffer
 }
