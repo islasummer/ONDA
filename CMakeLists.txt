@@ -12,6 +12,7 @@ add_executable(ONDA
         pcmread.h
         pitchassignclass.h
         pitchdetectclass.h
+        displayclass.h
 )
 
 target_link_libraries(ONDA fftw3 record wiringPi wiringPiDev)
